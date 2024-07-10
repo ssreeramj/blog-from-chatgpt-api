@@ -1,2 +1,2 @@
-# blog-from-chatgpt-api
-API for the Blog-from-ChatGPT project
+# Blog from ChatGPT
+API for the Blog-from-ChatGPT app.
