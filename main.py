@@ -1,12 +1,15 @@
 #!/usr/bin/env python
+from typing import Dict
+
 import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from langchain_groq import ChatGroq
-from langserve import add_routes
-from typing import Dict
+from fastapi.middleware.cors import CORSMiddleware
 from langchain_core.messages import HumanMessage
 from langchain_core.runnables import RunnableLambda
+from langchain_groq import ChatGroq
+from langserve import add_routes
+
 from agent import my_agent
 from blog_agent import build_graph
 from scraper import ChatGPTScraper
@@ -19,15 +22,25 @@ app = FastAPI(
     description="A simple api server that returns back a structured blog from ChatGPT chats.",
 )
 
+
+# Set all CORS enabled origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["*"],
+)
+
+
 def format_input(chat_url: str) -> Dict[str, str]:
     scraper = ChatGPTScraper(url=chat_url)
     full_conversation = scraper.get_full_conversation()
 
-    return {
-        "blog_title": scraper.title, 
-        "full_conversation": full_conversation
-    }
-    
+    return {"blog_title": scraper.title, "full_conversation": full_conversation}
+
+
 def format_output(agent_response):
     return agent_response["article"]
 

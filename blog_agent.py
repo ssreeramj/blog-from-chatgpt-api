@@ -2,19 +2,18 @@
 import asyncio
 from typing import List, TypedDict
 
+from dotenv import load_dotenv
 from langchain.prompts import ChatPromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import SKLearnVectorStore
 from langchain_core.output_parsers import StrOutputParser
-from langgraph.graph import END, StateGraph
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langgraph.graph import END, StateGraph
 
 from formatters import BlogSection, Outline
 from scraper import ChatGPTScraper
 
-from dotenv import load_dotenv
-
-LLM_MODEL =  ChatOpenAI(name="gpt-4o")
+LLM_MODEL = ChatOpenAI(name="gpt-4o")
 EMBEDDINGS = OpenAIEmbeddings(model="text-embedding-3-small")
 retriever = None
 

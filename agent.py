@@ -1,19 +1,20 @@
 from typing import Annotated, Literal, TypedDict
 
-from langchain_core.messages import HumanMessage
-from langchain_groq import ChatGroq
-from langchain_core.tools import tool
-from langgraph.checkpoint import MemorySaver
-from langgraph.graph import END, StateGraph, MessagesState
-from langgraph.prebuilt import ToolNode
-from langchain_core.pydantic_v1 import BaseModel, Field
-
 from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage
+from langchain_core.pydantic_v1 import BaseModel, Field
+from langchain_core.tools import tool
+from langchain_groq import ChatGroq
+from langgraph.checkpoint import MemorySaver
+from langgraph.graph import END, MessagesState, StateGraph
+from langgraph.prebuilt import ToolNode
 
 load_dotenv()
 
+
 class LocationInput(BaseModel):
     location: str = Field(..., description="name of the location to get the weather")
+
 
 # Define the tools for the agent to use
 @tool("get-weather")
@@ -31,9 +32,10 @@ tool_node = ToolNode(tools)
 
 model = ChatGroq(model="llama3-8b-8192").bind_tools(tools)
 
+
 # Define the function that determines whether to continue or not
 def should_continue(state: MessagesState):
-    messages = state['messages']
+    messages = state["messages"]
     last_message = messages[-1]
     # If the LLM makes a tool call, then we route to the "tools" node
     if last_message.tool_calls:
@@ -44,7 +46,7 @@ def should_continue(state: MessagesState):
 
 # Define the function that calls the model
 def call_model(state: MessagesState):
-    messages = state['messages']
+    messages = state["messages"]
     response = model.invoke(messages)
     # We return a list, because this will get added to the existing list
     return {"messages": [response]}
@@ -73,7 +75,7 @@ def my_agent():
 
     # We now add a normal edge from `tools` to `agent`.
     # This means that after `tools` is called, `agent` node is called next.
-    workflow.add_edge("tools", 'agent')
+    workflow.add_edge("tools", "agent")
 
     # Initialize memory to persist state between graph runs
     # checkpointer = MemorySaver()
@@ -93,7 +95,7 @@ if __name__ == "__main__":
 
     final_state = agent.invoke(
         {"messages": [HumanMessage(content="what is the weather in Mumbai?")]},
-        config={"configurable": {"thread_id": 42}}
+        config={"configurable": {"thread_id": 42}},
     )
 
     print(final_state["messages"][-1].content)
