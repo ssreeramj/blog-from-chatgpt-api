@@ -8,6 +8,7 @@ from langchain_groq import ChatGroq
 from langgraph.checkpoint import MemorySaver
 from langgraph.graph import END, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
+from langchain_openai.chat_models import ChatOpenAI
 
 load_dotenv()
 
@@ -22,15 +23,16 @@ def search(location: str):
     """Call to surf the web."""
     # This is a placeholder, but don't tell the LLM that...
     if "sf" in location.lower() or "san francisco" in location.lower():
-        return ["It's 60 degrees and foggy."]
-    return ["It's 90 degrees and sunny."]
+        return "It's 60 degrees and foggy."
+    return "It's 90 degrees and sunny."
 
 
 tools = [search]
 
 tool_node = ToolNode(tools)
 
-model = ChatGroq(model="llama3-8b-8192").bind_tools(tools)
+# model = ChatGroq(model="llama3-70b-8192").bind_tools(tools)
+model = ChatOpenAI(model="gpt-4o").bind_tools(tools)
 
 
 # Define the function that determines whether to continue or not
