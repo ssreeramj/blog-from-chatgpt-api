@@ -1,0 +1,15 @@
+{
+    "public": false,
+    "builds": [
+        {
+            "src": "redrock/main.py.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "/redrock/server.py"
+        }
+    ]
+}
